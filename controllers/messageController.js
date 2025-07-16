@@ -1,8 +1,7 @@
 const Message = require('../models/Message');
-// controllers/messageController.js
 
-
-const obtenerMensajes = async (req, res) => {
+// Obtener mensajes con un partner
+exports.obtenerMensajes = async (req, res) => {
   try {
     const userId = req.header('x-user-id');
     const partnerId = req.params.partnerId;
@@ -12,16 +11,17 @@ const obtenerMensajes = async (req, res) => {
         { de: userId, para: partnerId },
         { de: partnerId, para: userId }
       ]
-    }).sort('creadoEn');
+    }).sort({ creadoEn: 1 });
 
     res.json(mensajes);
   } catch (err) {
-    console.error('❌ Error al obtener mensajes:', err);
+    console.error(err);
     res.status(500).json({ message: 'Error al cargar mensajes' });
   }
 };
 
-const enviarMensaje = async (req, res) => {
+// Enviar mensaje a un partner
+exports.enviarMensaje = async (req, res) => {
   try {
     const userId = req.header('x-user-id');
     const partnerId = req.params.partnerId;
@@ -34,9 +34,7 @@ const enviarMensaje = async (req, res) => {
 
     res.json(nuevoMensaje);
   } catch (err) {
-    console.error('❌ Error al enviar mensaje:', err);
+    console.error(err);
     res.status(500).json({ message: 'Error al enviar mensaje' });
   }
 };
-
-module.exports = { obtenerMensajes, enviarMensaje };

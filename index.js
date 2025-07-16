@@ -18,7 +18,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: '*', // Puedes cambiar a 'http://localhost:3000' o tu dominio
+    origin: '*', // Cambia a tu frontend, por ejemplo 'http://localhost:3000'
     methods: ['GET', 'POST'],
   },
 });
@@ -32,6 +32,17 @@ app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/messages', messageRoutes);
 
+// Manejo 404 para rutas no definidas
+app.use((req, res, next) => {
+  res.status(404).json({ message: 'Ruta no encontrada' });
+});
+
+// Middleware para manejo de errores
+app.use((err, req, res, next) => {
+  console.error('Error:', err.stack);
+  res.status(500).json({ message: 'Error interno del servidor' });
+});
+
 // Conexión con MongoDB
 mongoose
   .connect(process.env.MONGO_URI, {
@@ -42,10 +53,14 @@ mongoose
   .catch((err) => console.error('❌ Error al conectar MongoDB:', err));
 
 // Socket.IO para videollamadas
-io.on('connection', socket => {
+io.on('connection', (socket) => {
   console.log('📡 Nuevo usuario conectado:', socket.id);
 
-  socket.on('join-room', roomId => {
+  socket.on('disconnect', () => {
+    console.log('❌ Usuario desconectado:', socket.id);
+  });
+
+  socket.on('join-room', (roomId) => {
     socket.join(roomId);
     socket.to(roomId).emit('user-joined');
   });
@@ -62,7 +77,6 @@ io.on('connection', socket => {
     socket.to(roomId).emit('ice-candidate', { candidate });
   });
 });
-
 
 // Inicia servidor
 const PORT = process.env.PORT || 4000;

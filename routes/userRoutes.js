@@ -1,22 +1,23 @@
 const express = require('express');
-const router = express.Router();
 const {
-  obtenerUsuarios,
-  darLike,
-  obtenerMatches,
-  obtenerUsuarioPorId,
-  actualizarUsuario,
-  crearUsuario
+  getAllUsers,
+  getUserById,
+  updateUser,
+  likeUser,
 } = require('../controllers/userController');
 
-// Ruta para obtener matches (debe estar antes que /:id si existe esa ruta)
-router.get('/matches/:id', obtenerMatches);
+const router = express.Router();
 
-// Otras rutas
-router.get('/', obtenerUsuarios);
-router.get('/:id', obtenerUsuarioPorId);
-router.post('/', crearUsuario);
-router.put('/:id', actualizarUsuario);
-router.post('/like/:id', darLike);
+// Obtener todos los usuarios
+router.get('/', getAllUsers);
+
+// Obtener usuario por ID
+router.get('/:id', getUserById);
+
+// Actualizar usuario (por ejemplo perfil)
+router.put('/:id', updateUser);
+
+// Dar like a un usuario
+router.post('/:id/like', likeUser);
 
 module.exports = router;

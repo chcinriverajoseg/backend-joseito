@@ -1,14 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Message = require('../models/Message');
-const { obtenerMensajes, enviarMensaje } = require('../controllers/messageController');
 
-
-router.get('/:partnerId', obtenerMensajes);
-router.post('/:partnerId', enviarMensaje);
-
-
-
+// Obtener mensajes con un partner
 router.get('/:partnerId', async (req, res) => {
   try {
     const userId = req.header('x-user-id');
@@ -19,7 +13,7 @@ router.get('/:partnerId', async (req, res) => {
         { de: userId, para: partnerId },
         { de: partnerId, para: userId }
       ]
-    }).sort({ creadoEn: 1 }); // ordenar ascendente por fecha
+    }).sort({ creadoEn: 1 });
 
     res.json(mensajes);
   } catch (err) {
@@ -28,6 +22,7 @@ router.get('/:partnerId', async (req, res) => {
   }
 });
 
+// Enviar mensaje a un partner
 router.post('/:partnerId', async (req, res) => {
   try {
     const userId = req.header('x-user-id');
